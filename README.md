@@ -1,6 +1,7 @@
 
 # FlagZ - modern flag library for Java/Scala
 
+[![Travis Build](https://travis-ci.org/mwitkow/java-flagz.svg)](https://travis-ci.org/mwitkow/java-flagz)
 [![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 A modern, annotation-based flags library for Java and Scala that's tailored for large codebases.
