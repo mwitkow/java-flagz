@@ -1,0 +1,77 @@
+# SBT
+dist/*
+boot/
+project/boot/
+project/plugins/project/
+lib_managed/
+src_managed/
+target/
+.history
+
+# IntelliJ
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# Eclipse
+.cache
+.classpath
+.loadpath
+.metadata
+.project
+.scala_dependencies
+.settings
+.target/
+*.launch
+
+# NetBeans
+nbproject/
+nbbuild/
+dist/
+nbdist/
+nbactions.xml
+nb-configuration.xml
+
+# TextMate
+*.tmproj
+*.tmproject
+tmtags
+
+# Sublime Text
+*.sublime-workspace
+
+# vim
+.*.s[a-w][a-z]
+*.un~
+Session.vim
+.netrwhist
+*~
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+.elc
+auto-save-list
+tramp
+.\#*
+.org-id-locations
+*_archive
+
+# Mac OS X
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
