@@ -4,7 +4,10 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -15,12 +18,21 @@ import java.util.stream.Collectors;
  */
 public class FlagFieldRegistry {
 
+  private static final Logger LOG = LoggerFactory.getLogger(FlagFieldRegistry.class);
   private final Set<FlagFieldScanner> scanners;
   private Map<String, FlagField<?>> nameToField = Maps.newHashMap();
   private Map<String, FlagField<?>> allNamesToField = Maps.newHashMap();
 
   FlagFieldRegistry(Set<FlagFieldScanner> scanners) {
     this.scanners = scanners;
+  }
+
+  /** Transforms unused {@link FlagField} objects for pretty printing */
+  static String[] unusedFlagsMessages(Set<FlagField<?>> unusedFlags) {
+    String header = "The following flag is unused - it will have no effect on the system: ";
+    return unusedFlags.stream()
+        .map(flag -> header + Utils.flagDescriptorString(flag))
+        .toArray(String[]::new);
   }
 
   /** Retrieves the Flag by its default name. */
@@ -55,10 +67,22 @@ public class FlagFieldRegistry {
     if (unknownNames.size() > 0) {
       throw new FlagException.UnknownFlag(unknownNames.stream().collect(Collectors.joining(",")));
     }
+    Set<FlagField<?>> unusedFlags = unusedFlags(nameToValue);
+    if (!unusedFlags.isEmpty()) {
+      Arrays.stream(unusedFlagsMessages(unusedFlags)).forEach(LOG::warn);
+    }
     for (String name : nameToValue.keySet()) {
       FlagField<?> field = allNamesToField.get(name);
       field.parseString(nameToValue.get(name));
     }
+  }
+
+  /** Returns a set of all user-passed flags which are marked as unused. */
+  Set<FlagField<?>> unusedFlags(Map<String, String> nameToValue) {
+    return nameToValue.keySet().stream()
+        .map(key -> allNamesToField.get(key))
+        .filter(flag -> flag != null && flag.unusedMarker)
+        .collect(Collectors.toSet());
   }
 
   Set<FlagField<?>> allFields() {

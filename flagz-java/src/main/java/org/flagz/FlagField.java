@@ -63,6 +63,7 @@ public abstract class FlagField<T> extends BaseFlag<T> {
     // Extract the Class<X> or ParametrizedType<X> from Flag<X>
     this.containingFieldType = ((ParameterizedType) containingField.getGenericType())
         .getActualTypeArguments()[0];
+    this.unusedMarker = containingField.isAnnotationPresent(FlagzUnused.class);
   }
 
   Field containingField() {

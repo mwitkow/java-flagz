@@ -2,6 +2,8 @@ package org.flagz;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.util.LinkedList;
@@ -17,12 +19,15 @@ import java.util.function.Predicate;
  */
 class BaseFlag<T> implements Flag<T> {
 
+  private static final Logger LOG = LoggerFactory.getLogger(FlagFieldRegistry.class);
+
   private volatile T value;
   private final T defaultValue;
 
   protected String name;
   protected String altName;
   protected String help;
+  protected boolean unusedMarker;
 
   private final List<Predicate<T>> validators = new LinkedList<>();
   private final List<Consumer<T>> listeners = new LinkedList<>();
@@ -34,6 +39,10 @@ class BaseFlag<T> implements Flag<T> {
 
   @Override
   public T get() {
+    if (unusedMarker) {
+      String errMsg = String.format("Trying to get a value from flag: %s, which is marked as unused.", name);
+      LOG.error(errMsg);
+    }
     return value;
   }
 
