@@ -25,13 +25,17 @@ class Utils {
     builder.append("List of Flagz available in this program:\n");
     builder.append("\n");
     for (FlagField<?> field : sorted) {
-      String flag = Strings.isNullOrEmpty(field.altName())
-          ? String.format("--%s", field.name())
-          : String.format("--%s [-%s]", field.name(), field.altName());
+      String flag = flagDescriptorString(field);
       builder.append(String.format("%-35s\t%s\t[default='%s']\n", flag, field.help(),
                                    flagDefaultValue(field)));
     }
     System.out.println(builder.toString());
+  }
+
+  static String flagDescriptorString(FlagField<?> field) {
+    return Strings.isNullOrEmpty(field.altName())
+        ? String.format("--%s", field.name())
+        : String.format("--%s [-%s]", field.name(), field.altName());
   }
 
   /**
