@@ -103,7 +103,7 @@ To use this flag library, include this in your `pom.xml`:
   <dependency>
     <groupId>org.flagz</groupId>
     <artifactId>flagz</artifactId>
-    <version>2.10</version>
+    <version>2.2</version>
   </dependency>
   ...
 </dependencies>

@@ -7,7 +7,7 @@ publish :=() // don't publish the root aggregate project.
 
 organization.in(Global) := "org.flagz"
 
-version.in(Global) := "2.1.0"
+version.in(Global) := "2.2.0"
 
 licenses.in(Global) := Seq("MIT License" -> url("https://github.com/sbt/sbt-assembly/blob/master/LICENSE"))
 
