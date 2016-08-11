@@ -4,6 +4,7 @@ import sbt.Tests
 name := "flagz-root"
 
 publish :=() // don't publish the root aggregate project.
+publishTo.in(Global) := Some(Resolver.file("file", new File(Path.userHome.absolutePath + "/.m2/repository")))
 
 organization.in(Global) := "org.flagz"
 
