@@ -7,6 +7,7 @@ import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
@@ -42,6 +43,29 @@ public class FlagFieldRegistry {
       throw new FlagException.UnknownFlag(name);
     }
     return field;
+  }
+
+  /**
+   * Returns a reference to all the flags contained in this registry. Note that value changes which
+   * happen after calling this method will be reflected in the returned list.
+   */
+  public Set<Flag<?>> getAllFields() {
+    return ImmutableSet.copyOf(nameToField.values());
+  }
+
+  /**
+   * Returns a reference to all the flags contained in this registry which are annotated with an
+   * annotation of the supplied type. Note that value changes which happen after calling this
+   * method will be reflected in the returned list.
+   */
+  public Set<Flag<?>> getFieldsAnnotatedWith(Class<? extends Annotation> annotationType) {
+    ImmutableSet.Builder<Flag<?>> result = ImmutableSet.builder();
+    nameToField.values().forEach(flag -> {
+      if (flag.containingField().isAnnotationPresent(annotationType)) {
+        result.add(flag);
+      }
+    });
+    return result.build();
   }
 
   /** Sets the value of the Flag, parsing it from string. */

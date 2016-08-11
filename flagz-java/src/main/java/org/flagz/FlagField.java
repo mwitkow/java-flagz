@@ -2,7 +2,9 @@ package org.flagz;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -38,6 +40,11 @@ public abstract class FlagField<T> extends BaseFlag<T> {
 
   public String valueString(T value) {
     return value.toString();
+  }
+
+  /** Returns the annotations present on the flag field. */
+  public ImmutableList<Annotation> getAnnotations() {
+    return ImmutableList.copyOf(containingField.getAnnotations());
   }
 
   /**
