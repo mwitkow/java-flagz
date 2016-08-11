@@ -5,6 +5,8 @@ import com.google.common.collect.ImmutableSet;
 import org.flagz.testclasses.SomeEnum;
 import org.junit.Test;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -22,6 +24,12 @@ public class PrimitiveFlagFieldTest {
 
   public static final String[] EMPTY_ARGS = {};
   public static final List<String> EMPTY_PACKAGE_PREFIXES = ImmutableList.of();
+
+  @Retention(RetentionPolicy.RUNTIME)
+  public @interface CustomAnnotation {}
+
+  @Retention(RetentionPolicy.RUNTIME)
+  public @interface OtherCustomAnnotation {}
 
   @FlagInfo(name = "test_int_flag", help = "")
   final Flag<Integer> integerFlag = Flagz.valueOf(1337);
@@ -50,9 +58,19 @@ public class PrimitiveFlagFieldTest {
   @FlagInfo(name = "test_enum_flag", help = "")
   final Flag<SomeEnum> enumFlag = Flagz.valueOf(SomeEnum.NORMAL);
 
+  @CustomAnnotation
+  @FlagInfo(name = "test_annotated_flag", help = "")
+  final Flag<String> annotatedFlag = Flagz.valueOf("");
 
   final Set<Object> SET_OF_THIS_TEST = ImmutableSet.of(this);
 
+  @Test
+  public void testAnnotatedFlag() {
+    String[] args = {};
+    FlagFieldRegistry registry = Flagz.parse(args, EMPTY_PACKAGE_PREFIXES, SET_OF_THIS_TEST);
+    assertThat(registry.getFieldsAnnotatedWith(CustomAnnotation.class).size(), is(1));
+    assertThat(registry.getFieldsAnnotatedWith(OtherCustomAnnotation.class).isEmpty(), is(true));
+  }
 
   @Test
   public void testSmokeNoCrosstalk() {
