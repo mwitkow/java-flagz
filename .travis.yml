@@ -1,15 +1,31 @@
-language: scala
+dist: xenial
+
+
+jdk:
+  - oraclejdk8
+
+env:
+  - BAZEL_VERSION=0.3.2
+
+addons:
+  apt:
+    packages:
+      - wget
 
 cache:
   directories:
-    - $HOME/.m2
+    - $HOME/bazel/install
+    - $HOME/bazel/outbase
 
-scala:
-   - 2.11.4
-
-# Travis has a bug, only oraclejdk8 is a valid keyword https://github.com/travis-ci/travis-ci/issues/1647
-jdk:
- - oraclejdk8
+before_install:
+  - mkdir -p ${HOME}/bazel/install
+  - cd ${HOME}/bazel/install
+  - wget --no-clobber "https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel_${BAZEL_VERSION}-linux-x86_64.deb" 
+  - chmod +x bazel_${BAZEL_VERSION}-linux-x86_64.deb
+  - sudo dpkg -i bazel_${BAZEL_VERSION}-linux-x86_64.deb
+  - cd ${TRAVIS_BUILD_DIR}
+  - mv .bazelrc .bazelrc.orig
+  - cat .bazelrc.travis .bazelrc.orig > .bazelrc
 
 script:
-   - sbt ++$TRAVIS_SCALA_VERSION test
+  - bazel --output_base=${HOME}/bazel/outbase test //...

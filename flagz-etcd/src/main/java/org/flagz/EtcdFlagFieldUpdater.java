@@ -50,7 +50,7 @@ public class EtcdFlagFieldUpdater {
   @FlagInfo(name = "flagz_etcd_server_uris",
             help = "List of comma-delimited URIs for etc.d servers.")
   private static final Flag<List<String>> urisFlag = Flagz
-      .valueOf(ImmutableList.of("https://127.0.0.1:4001"));
+      .valueOf(ImmutableList.of("https://127.0.0.1:2379"));
 
   @FlagInfo(name = "flagz_etcd_retry_policy",
             help = "Name of EtcdRetryPolicy to use for all accesses")
