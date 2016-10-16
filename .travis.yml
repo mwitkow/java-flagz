@@ -20,4 +20,7 @@ before_install:
   - cat .bazelrc.travis .bazelrc.orig > .bazelrc
 
 script:
+  - echo ${PWD}
   - bazel test //...
+  - ls -al ${HOME}/*
+  - ls -al $HOME/.cache/bazel
