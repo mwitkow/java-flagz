@@ -12,15 +12,20 @@ addons:
     packages:
       - wget
 
+cache:
+  directories:
+    - $HOME/bazel/install
+    - $HOME/bazel/outbase
+
 before_install:
-  - wget "https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel_${BAZEL_VERSION}-linux-x86_64.deb"
+  - mkdir -p ${HOME}/bazel/install
+  - cd ${HOME}/bazel/install
+  - wget --no-clobber "https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel_${BAZEL_VERSION}-linux-x86_64.deb" 
   - chmod +x bazel_${BAZEL_VERSION}-linux-x86_64.deb
   - sudo dpkg -i bazel_${BAZEL_VERSION}-linux-x86_64.deb
+  - cd ${TRAVIS_BUILD_DIR}
   - mv .bazelrc .bazelrc.orig
   - cat .bazelrc.travis .bazelrc.orig > .bazelrc
 
 script:
-  - echo ${PWD}
-  - bazel test //...
-  - ls -al ${HOME}/*
-  - ls -al $HOME/.cache/bazel
+  - bazel --output_base=${HOME}/bazel/outbase test //...
