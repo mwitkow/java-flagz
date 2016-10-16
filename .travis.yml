@@ -12,10 +12,10 @@ addons:
       - wget
 
 before_install:
-  - wget 'https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel_0.2.2b-linux-x86_64.deb'
-  - sha256sum -c src/tools/bazel_${BAZEL_VERSION}-linux-x86_64.deb.sha256
-  - chmod +x bazel_${BAZEL_VERSION}-linux-x86_64.deb
-  - sudo dpkg -i bazel_${BAZEL_VERSION}-linux-x86_64.deb
+  - wget 'https://github.com/bazelbuild/bazel/releases/download/$BAZEL_VERSION/bazel_$BAZEL_VERSION-linux-x86_64.deb'
+  - sha256sum -c src/tools/bazel_$BAZEL_VERSION-linux-x86_64.deb.sha256
+  - chmod +x bazel_$BAZEL_VERSION-linux-x86_64.deb
+  - sudo dpkg -i bazel_$BAZEL_VERSION-linux-x86_64.deb
   - mv .bazelrc .bazelrc.orig
   - cat .bazelrc.travis .bazelrc.orig > .bazelrc
 
