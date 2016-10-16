@@ -109,22 +109,48 @@ To use this flag library, include this in your `pom.xml`:
 </dependencies>
 ```    
 
-### Manual compilation and local publishing
+### Development
 
-Obviously git-clone this repo.
+Obviously git-clone this repo. Then install [bazel](https://www.bazel.io/versions/master/docs/install.html)>=0.3.2, which is a fantastic build system that this project uses.
+Bazel takes care of downloading all other dependencies (Scala, etcd), the only system requirement is JDK>=8.0.
 
-Then, do:
+To run all the tests:
 
-    $ sbt publish
+```bash
+bazel test //...
+```
 
-This should create the relevant `.jar` files in the `target` directories of each project, e.g. `flagz-java/target` and
-`flagz-scala/target`.
+#### Publishing (internal stuff)
 
-Copy these to your application, or alternatively publish the artifacts locally
+The way that bazel `BUILD` files are laid out in this project is along the lines of old Maven packages. This means that each target
+is a maven-deliverable.
 
-    $ sbt publish-local
-    
-This will populate your local Ivy cache (the Maven repo cache) with newly constructed artifacts.
+To build all of them using:
+
+```
+bazel build //flagz-java/src/main/java/org/flagz
+bazel build //flagz-etcd/src/main/java/org/flagz
+bazel build //flagz-scala/src/main/scala/org/flagz
+```
+
+The command line will output you the relevant `.jar` file containing the distributable. **TODO(mwitkow)** Add a script for Maven publishing.
+
+
+#### Sample Apps
+
+The `samples/` directory contains two sample JVM apps that show case what's going on.
+
+You can run the JMX example
+
+```bash
+bazel run -- //samples/src/main/java/org/flagz/samples:jmx
+```
+
+or (with a running [etcd instance](https://github.com/coreos/etcd/releases)) the etcd demo:
+
+```bash
+bazel run -- //samples/src/main/java/org/flagz/samples:etcd --flagz_etcd_directory=/foo
+```
 
 ## Status
 
