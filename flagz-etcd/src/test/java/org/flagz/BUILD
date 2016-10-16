@@ -1,7 +1,7 @@
 java_test(
   name = "tests",
   srcs = glob(['*.java']),
-  size = "medium",
+  size = "large",
   deps = [
     "//flagz-java/src/main/java/org/flagz",
     "//flagz-etcd/src/main/java/org/flagz",
