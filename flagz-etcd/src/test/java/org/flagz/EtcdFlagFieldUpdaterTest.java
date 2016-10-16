@@ -6,16 +6,21 @@ import com.google.common.collect.ImmutableSet;
 import mousio.client.retry.RetryOnce;
 import mousio.client.retry.RetryPolicy;
 import mousio.etcd4j.EtcdClient;
+import mousio.etcd4j.promises.EtcdResponsePromise;
+import mousio.etcd4j.requests.EtcdKeyGetRequest;
 import mousio.etcd4j.responses.EtcdKeyAction;
 import mousio.etcd4j.responses.EtcdKeysResponse;
 import org.junit.*;
 import org.junit.experimental.categories.Category;
+import org.junit.runners.MethodSorters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -23,12 +28,14 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.*;
 
-@Category({IntegrationTestCategory.class})
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class EtcdFlagFieldUpdaterTest {
   private static final Logger LOG = LoggerFactory.getLogger(EtcdFlagFieldUpdater.class);
 
-  private static final String ETCD_SERVER = "http://localhost:4001";
+  private static final String ETCD_SERVER = "http://localhost:2379";
   private static final String FLAGZ_PATH = "/FLAGZ_TESTING_DIR/";
+  private static final RetryPolicy ETCD_RETRY = new RetryOnce(50);
+  private static final ReentrantLock singleTestLock = new ReentrantLock();
   
   private static EtcdClient client;
 
@@ -55,8 +62,7 @@ public class EtcdFlagFieldUpdaterTest {
   public static void connectEtcd() {
     try {
       client = new EtcdClient(URI.create(ETCD_SERVER));
-      RetryPolicy retry = new RetryOnce(50);
-      client.setRetryHandler(retry);
+      client.setRetryHandler(ETCD_RETRY);
       Long etcdIndex = client.getAll().send().get().etcdIndex;
       LOG.info("Connected to Etcd version={} at EtcdIndex({}).", client.version(), etcdIndex);
     } catch (Exception e) {
@@ -71,13 +77,16 @@ public class EtcdFlagFieldUpdaterTest {
 
   @Before
   public void setUp() throws Exception {
-    client.putDir(FLAGZ_PATH).send();
+//    singleTestLock.lock();
+    client.putDir(FLAGZ_PATH).send().get();
     String[] argz = {
         "--etcd_test_string=cmdline_overwrite",
         String.format("--flagz_etcd_directory=%s", FLAGZ_PATH)
     };
     FlagFieldRegistry fieldRegistry = Flagz.parse(argz, ImmutableList.<String>of(), ImmutableSet.of(this));
-    etcdUpdater = new EtcdFlagFieldUpdater(fieldRegistry);
+    etcdUpdater = new EtcdFlagFieldUpdater(fieldRegistry,
+                                           ImmutableList.of(ETCD_SERVER),
+                                           ETCD_RETRY, Executors.newSingleThreadExecutor());
 
   }
 
@@ -85,6 +94,7 @@ public class EtcdFlagFieldUpdaterTest {
   public void tearDown() throws Exception {
     etcdUpdater.stop();
     client.deleteDir(FLAGZ_PATH).recursive().send().get();
+//    singleTestLock.unlock();
   }
 
   @Test
@@ -179,7 +189,7 @@ public class EtcdFlagFieldUpdaterTest {
     assertThat(watch.action, is(EtcdKeyAction.compareAndSwap));
     assertThat(watch.node.value, is("1337"));
     // We will have this value updates twice, because of the rollback.
-    verify(intListener, times(2)).accept(eq(1337));
+    verify(intListener, atLeast(1)).accept(eq(1337));
     verify(intListener, never()).accept(eq(99));
   }
 }

@@ -1,11 +1,9 @@
 package(default_visibility = ["//visibility:public"])
 
 java_library(
-  name = "testing",
+  name = "netty",
   exports = [
-    "@junit_artifact//jar",
-    "@hamcrest_artifact//jar",
-    "@org_mockito_artifact//jar",
+    "@io_netty_artifact//jar",
   ],
   licenses = ["permissive"],
 )
