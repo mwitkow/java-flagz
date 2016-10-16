@@ -1,0 +1,7 @@
+test --test_output=errors
+test --legacy_bazel_java_test
+test --test_size_filters=-large,-enormous
+
+build --javacopt="-extra_checks:off"
+build --javacopt="-source 8"
+build --javacopt="-target 8"

@@ -13,13 +13,13 @@ public enum EtcdRetryPolicy implements Supplier<RetryPolicy> {
   EXPONENTIAL_BACKOFF_5MS_MAX_10_TIMES {
     @Override
     public RetryPolicy get() {
-      return new RetryWithExponentialBackOff(5, 10, -1);  // max 5ms * 2**10 = 5sec.
+      return new RetryWithExponentialBackOff(5, 10, 5 * 60 * 1000);  // max 5ms * 2**10 = 5sec.
     }
   },
   EXPONENTIAL_BACKOFF_10MS_MAX_20_TIMES {
     @Override
     public RetryPolicy get() {
-      return new RetryWithExponentialBackOff(10, 13, -1);  // max 10ms * 2*20 = 160 sec
+      return new RetryWithExponentialBackOff(10, 13, 160 * 1000);  // max 10ms * 2*20 = 160 sec
     }
   },
   LINEAR_5MS_MAX_20_TIMES {
